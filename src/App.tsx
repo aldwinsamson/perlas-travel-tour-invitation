@@ -9,7 +9,6 @@ import { FallbackFlight, FallbackSky } from './components/intro/FallbackSky';
 import { revealHero } from './components/hero/revealHero';
 import { BOOT_MIN_MS, engineAtLoad, flightTiming, setBootProgress, sinceNavigation, type Engine } from './utils/intro';
 
-/** loading = static boot screen is up; playing = flight in progress; done / off = normal page */
 type Stage = 'off' | 'loading' | 'playing' | 'done';
 
 const root = () => document.documentElement;
@@ -36,11 +35,10 @@ export default function App() {
   const startFlight = useCallback(() => {
     setStage('playing');
     root().setAttribute('data-intro', 'playing');
-    void import('gsap'); // warm the chunk now so the reveal fires instantly
+    void import('gsap'); 
   }, []);
 
   const onFail = useCallback(() => {
-    // 3d gave up. if it was mid-flight just let the page appear, otherwise swap in the light css intro
     setStage((s) => {
       if (s === 'playing') {
         reveal();
@@ -51,7 +49,6 @@ export default function App() {
     setEngine('css');
   }, [reveal]);
 
-  // css intro: wait out the boot screen's minimum time, then fly
   useEffect(() => {
     if (engine !== 'css' || stage !== 'loading') return;
     setBootProgress(0.85);
@@ -62,14 +59,12 @@ export default function App() {
     return () => clearTimeout(id);
   }, [engine, stage, startFlight]);
 
-  // failsafe: whatever goes wrong, the invitation always appears
   useEffect(() => {
     if (stage === 'off' || stage === 'done') return;
     const id = window.setTimeout(finish, Math.max(1500, eventConfig.intro.failsafeSeconds * 1000 - sinceNavigation()));
     return () => clearTimeout(id);
   }, [stage, finish]);
 
-  // the invitation is not reachable (focus, screen readers) until the aircraft has passed
   useEffect(() => {
     const site = document.getElementById('site');
     site?.toggleAttribute('inert', stage === 'loading' || stage === 'playing');

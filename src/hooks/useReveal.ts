@@ -1,9 +1,5 @@
 import { useEffect } from 'react';
 
-/**
- * marks anything with [data-reveal] as visible once it scrolls into view.
- * content is visible by default in css; only html.js-reveal hides it, so a failed script never hides the page.
- */
 export function useReveal(enabled: boolean) {
   useEffect(() => {
     const root = document.documentElement;

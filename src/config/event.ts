@@ -2,7 +2,6 @@ import type { EventConfig, EventStatusSetting } from '../types';
 
 const env = import.meta.env;
 
-// the single source of truth. edit here and every section, the calendar file and the seo copy follow.
 export const eventConfig: EventConfig = {
   agency: {
     name: 'Perlas Travel & Tours',
@@ -26,7 +25,6 @@ export const eventConfig: EventConfig = {
     name: 'Intramuros Corporate Plaza',
     room: 'Room 209',
     area: 'Intramuros, Manila',
-    // a verified share link goes here (or VITE_GOOGLE_MAPS_URL). until then directions use a name search, which makes no coordinate claim.
     mapsUrl: env.VITE_GOOGLE_MAPS_URL ?? '',
     mapsQuery: 'Intramuros Corporate Plaza, Intramuros, Manila',
     mapsEmbedAllowed: true,
@@ -65,7 +63,6 @@ export const eventConfig: EventConfig = {
     },
     closing: 'Let\u2019s Explore, Discover, and Create More Journeys Together!',
   },
-  // suggestions only. no times are listed because none have been confirmed.
   program: {
     tentative: true,
     items: [
@@ -90,7 +87,6 @@ export const eventConfig: EventConfig = {
   contact: {
     email: '',
     phone: '',
-    // set VITE_FACEBOOK_URL / VITE_INSTAGRAM_URL (full https links to the official pages). nothing is guessed.
     socials: [
       { id: 'facebook', label: 'Facebook', url: env.VITE_FACEBOOK_URL ?? '' },
       { id: 'instagram', label: 'Instagram', url: env.VITE_INSTAGRAM_URL ?? '' },

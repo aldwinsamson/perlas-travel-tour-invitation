@@ -7,9 +7,7 @@ import { skyVertex, skyFragment, trailVertex, trailFragment } from './shaders';
 export interface SkyOptions {
   canvas: HTMLCanvasElement;
   lowPower: boolean;
-  /** phone-sized screen: shorter flight, smaller aircraft, cheaper clouds */
   compact: boolean;
-  /** false = no animation loop at all, a single still frame (reduced motion) */
   animated: boolean;
   onReveal?: () => void;
   onComplete?: () => void;
@@ -25,10 +23,8 @@ const smooth = (a: number, b: number, x: number) => {
 };
 const easeInOutSine = (x: number) => -(Math.cos(Math.PI * x) - 1) / 2;
 const easeInOutCubic = (x: number) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
-// slow emergence from the cloud bank, then it commits and climbs away
 const flightEase = (x: number) => 0.55 * easeInOutCubic(x) + 0.45 * easeInOutSine(x);
 
-/* ------------------------------------------------------------------ golden trail */
 class Trail {
   readonly mesh: THREE.Mesh;
   readonly material: THREE.ShaderMaterial;
@@ -115,7 +111,6 @@ class Trail {
   }
 }
 
-/* ------------------------------------------------------------------ scene */
 export class SkyScene {
   private readonly renderer: THREE.WebGLRenderer;
   private readonly scene = new THREE.Scene();
@@ -140,8 +135,8 @@ export class SkyScene {
   private mode: 'idle' | 'intro' | 'ambient' = 'idle';
   private raf = 0;
   private last = 0;
-  private clock = 0; // seconds of sky time (drives drift)
-  private t = 0; // intro time
+  private clock = 0; 
+  private t = 0; 
   private revealed = false;
   private active = true;
   private disposed = false;
@@ -172,11 +167,10 @@ export class SkyScene {
 
     this.renderer = new THREE.WebGLRenderer({
       canvas: o.canvas,
-      antialias: true, // phones too: the aircraft edges are the first thing the eye lands on; resolution is what gets traded for speed
+      antialias: true, 
       alpha: false,
       powerPreference: 'high-performance',
     });
-    // the clouds are soft, so resolution is the cheapest thing to trade for smoothness. phones start lower and can step down further mid-flight.
     const dprCap = hi ? 1.5 : o.compact ? 1.25 : 1.0;
     this.dpr = Math.min(window.devicePixelRatio || 1, dprCap);
     this.renderer.setPixelRatio(this.dpr);
@@ -221,7 +215,6 @@ export class SkyScene {
     this.resize();
   }
 
-  /* ---------------------------------------------------------------- environment */
   private buildEnv() {
     const s = new THREE.Scene();
     const g = new THREE.SphereGeometry(50, 40, 20);
@@ -251,8 +244,6 @@ export class SkyScene {
     (sunDisc.geometry as THREE.BufferGeometry).dispose();
   }
 
-  /* ---------------------------------------------------------------- model */
-  /** the bytes are downloaded once by utils/intro.ts; this only parses and prepares them */
   async load(bytes: ArrayBuffer): Promise<void> {
     if (this.model) return;
     const loader = new GLTFLoader();
@@ -269,8 +260,6 @@ export class SkyScene {
     m.add(this.tail);
     this.model = m;
     this.flight.add(m);
-    // warm everything the first flight frame needs (shaders AND texture uploads) while the loading screen still covers the canvas,
-    // otherwise the aircraft's first appearance stalls for a moment on phones
     m.traverse((n) => {
       const mesh = n as THREE.Mesh;
       if (!mesh.isMesh) return;
@@ -285,7 +274,6 @@ export class SkyScene {
     this.flight.visible = false;
   }
 
-  /* ---------------------------------------------------------------- layout / path */
   resize() {
     const c = this.renderer.domElement;
     const w = Math.max(1, c.clientWidth || window.innerWidth);
@@ -305,7 +293,6 @@ export class SkyScene {
   }
 
   private buildPath() {
-    // aspect-aware: the path is defined in screen space so it starts at the bottom-left corner on any device
     const portrait = this.cam.aspect < 0.9;
     const p0 = this.at(portrait ? -1.18 : -1.12, -1.08, 13);
     const p1 = this.at(portrait ? -0.45 : -0.35, -0.8, 22);
@@ -319,7 +306,6 @@ export class SkyScene {
     this.flight.scale.setScalar(len / MODEL_LENGTH);
     this.trailWidth = len * 0.045;
 
-    // choose the bank direction that shows the belly to the camera, tested once
     const pt = this.curve.getPoint(0.3);
     const tan = this.curve.getTangent(0.3);
     const belly = new THREE.Vector3(0, -1, 0).applyQuaternion(this.orientation(tan, 0.4));
@@ -332,7 +318,6 @@ export class SkyScene {
 
   private readonly mx = new THREE.Matrix4();
   private orientation(tangent: THREE.Vector3, bank: number) {
-    // reuses scratch objects: this runs every frame and a garbage-collection pause is exactly the kind of hitch to avoid
     const z = this.vA.copy(tangent).normalize();
     const x = this.vB.set(0, 1, 0).cross(z).normalize();
     const y = this.vC.copy(z).cross(x).normalize();
@@ -341,7 +326,6 @@ export class SkyScene {
     return this.qA.multiply(this.qB.setFromAxisAngle(this.zAxis, bank));
   }
 
-  /* ---------------------------------------------------------------- control */
   setScroll(v: number) {
     this.skyU.uScroll.value = v;
     if (!this.o.animated) this.renderOnce();
@@ -354,7 +338,6 @@ export class SkyScene {
     else cancelAnimationFrame(this.raf);
   }
 
-  /** show the first frame straight away so the visitor sees sky, not black, while the model loads */
   renderOnce() {
     if (this.disposed) return;
     this.renderer.render(this.scene, this.cam);
@@ -381,7 +364,6 @@ export class SkyScene {
     if (this.mode === 'intro') this.finish(true);
   }
 
-  /** calm drifting sky with no aircraft: used after the intro, on return visits and when the model can't load */
   ambient() {
     this.mode = 'ambient';
     this.flight.visible = false;
@@ -417,7 +399,7 @@ export class SkyScene {
 
   private readonly loop = (now: number) => {
     if (this.disposed) return;
-    const minGap = this.mode === 'intro' ? 0 : 33; // ambient sky is calm, 30fps is plenty
+    const minGap = this.mode === 'intro' ? 0 : 33; 
     if (now - this.last < minGap) {
       this.raf = requestAnimationFrame(this.loop);
       return;
@@ -441,9 +423,8 @@ export class SkyScene {
     }
   };
 
-  /** never cut the flight short on a slow device: quietly lower the render resolution instead, so motion stays fluid */
   private adaptResolution(dt: number) {
-    if (this.frames < 6) return; // the first frames include one-off setup cost
+    if (this.frames < 6) return; 
     this.winSum += dt;
     this.winN++;
     if (this.winN < 10) return;
@@ -476,7 +457,6 @@ export class SkyScene {
       this.flight.quaternion.copy(this.orientation(tan, bank));
       this.flight.visible = x > 0 && x < 1;
 
-      // gentle camera tracking, mirrored in the clouds so the whole scene has parallax depth
       const yaw = -0.05 * p;
       const pitch = 0.035 * p;
       this.cam.rotation.set(pitch, yaw, 0);
@@ -501,7 +481,6 @@ export class SkyScene {
       this.revealed = true;
       this.o.onReveal?.();
     }
-    // foreground bank thins out as the page takes over
     this.skyU.uFg.value = 1 - 0.15 * smooth(this.T_REVEAL, this.T_END, t);
     if (t >= this.T_END) this.finish(false);
   }

@@ -1,4 +1,3 @@
-// sky + clouds are drawn analytically in one fullscreen pass: no cloud textures to download,.
 export const skyVertex = /* glsl */ `
 varying vec2 vUv;
 void main() {

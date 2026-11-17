@@ -1,6 +1,5 @@
 import { useId } from 'react';
 
-/** the thin gold arc under the title on the invitation */
 export function Swoosh({ className = '', reveal = false }: { className?: string; reveal?: boolean }) {
   const id = useId();
   return (

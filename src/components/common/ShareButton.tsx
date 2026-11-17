@@ -3,7 +3,6 @@ import { Button } from './Button';
 import { Icon } from './Icon';
 import { eventConfig } from '../../config/event';
 
-/** native share sheet on phones, copy-link everywhere else. no third-party scripts. */
 export function ShareButton({ className = '' }: { className?: string }) {
   const [msg, setMsg] = useState('');
   const share = async () => {

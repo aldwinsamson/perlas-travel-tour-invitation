@@ -11,7 +11,6 @@ const snapshot = (): CountdownState => {
   return { ...remainingUntil(now, EVENT_START), phase: getPhase(now) };
 };
 
-/** ticks once a second, re-aligned to the wall clock so the seconds never drift */
 export function useCountdown(): CountdownState {
   const [state, setState] = useState<CountdownState>(snapshot);
   useEffect(() => {

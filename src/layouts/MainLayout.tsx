@@ -13,7 +13,6 @@ import Footer from '../components/footer/Footer';
 import StickyRsvp from '../components/navigation/StickyRsvp';
 import type { EventPhase } from '../types';
 
-/** memoised: the page does not re-render while the intro changes state, so the flight never competes with react */
 function MainLayout({ phase }: { phase: EventPhase }) {
   return (
     <div id="site" className="site-root">

@@ -3,21 +3,13 @@ import { NAV_OF, SECTION_IDS, type NavId, type SectionId } from '../constants/na
 
 const isSection = (id: string): id is SectionId => (SECTION_IDS as readonly string[]).includes(id);
 
-/** the current section is the last one whose top has passed the reading line. at the very bottom it is always the last one,
- *  because a short final section can never reach the line. `tops` must be in page order. */
 export function pickSection(tops: { id: SectionId; top: number }[], line: number, atBottom: boolean): SectionId {
-  if (atBottom) return tops[tops.length - 1].id;
-  let current = tops[0].id;
-  for (const t of tops) {
-    if (t.top <= line) current = t.id;
-    else break;
-  }
-  return current;
+  if (atBottom) return tops.reduce((a, b) => (b.top > a.top ? b : a)).id;
+  let best: { id: SectionId; top: number } | null = null;
+  for (const t of tops) if (t.top <= line && (!best || t.top > best.top)) best = t;
+  return (best ?? tops.reduce((a, b) => (b.top < a.top ? b : a))).id;
 }
 
-/** which menu item to underline.
- *  - follows the section you are reading, using scroll position (no gaps like an observer has)
- *  - clicking a link moves the underline there at once and holds it until the scroll stops, so it never flickers through the sections in between */
 export function useActiveSection(): NavId {
   const [active, setActive] = useState<NavId>('home');
 
@@ -25,46 +17,73 @@ export function useActiveSection(): NavId {
     const els = SECTION_IDS.map((id) => document.getElementById(id)).filter((el): el is HTMLElement => el !== null);
     if (!els.length) return;
     let pinned: NavId | null = null;
-    let release = 0;
+    let glide = 0;
     let raf = 0;
 
+    const landing = () => parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
+    const maxY = () => document.documentElement.scrollHeight - window.innerHeight;
+
     const compute = (): NavId => {
-      const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4;
-      // 35% down the screen, never above the point a clicked link scrolls its section to (below the fixed bar)
+      const atBottom = window.scrollY >= maxY() - 4;
       const line = Math.max(window.innerHeight * 0.35, 120);
       const tops = els.map((el) => ({ id: el.id as SectionId, top: el.getBoundingClientRect().top }));
       return NAV_OF[pickSection(tops, line, atBottom)];
     };
     const update = () => {
       raf = 0;
-      if (!pinned) setActive(compute());
+      if (pinned === null) setActive(compute());
     };
-    const unpin = () => {
+    const stop = () => {
+      if (glide) cancelAnimationFrame(glide);
+      glide = 0;
       pinned = null;
       update();
     };
+
+    const goTo = (el: HTMLElement) => {
+      if (glide) cancelAnimationFrame(glide);
+      const from = window.scrollY;
+      const target = () => Math.min(Math.max(0, el.getBoundingClientRect().top + window.scrollY - landing()), maxY());
+      const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const duration = calm ? 0 : Math.min(1100, 450 + Math.abs(target() - from) * 0.12);
+      const t0 = performance.now();
+      const step = (now: number) => {
+        const p = duration ? Math.min(1, Math.max(0, (now - t0) / duration)) : 1;
+        const eased = 1 - Math.pow(1 - p, 3);
+        window.scrollTo({ top: from + (target() - from) * eased, behavior: 'instant' });
+        if (p < 1) {
+          glide = requestAnimationFrame(step);
+        } else {
+          glide = 0;
+          pinned = null;
+          update();
+        }
+      };
+      glide = requestAnimationFrame(step);
+    };
+
     const onScroll = () => {
-      if (pinned) {
-        window.clearTimeout(release);
-        release = window.setTimeout(unpin, 160); // still scrolling toward the clicked link: keep holding
-      } else if (!raf) {
-        raf = requestAnimationFrame(update);
-      }
+      if (pinned === null && !raf) raf = requestAnimationFrame(update);
     };
     const onClick = (e: MouseEvent) => {
       if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
       const id = (e.target as Element).closest?.('a[href^="#"]')?.getAttribute('href')?.slice(1);
       if (!id || !isSection(id)) return;
+      const el = document.getElementById(id);
+      if (!el) return;
+      e.preventDefault();
       pinned = NAV_OF[id];
       setActive(pinned);
-      window.clearTimeout(release);
-      release = window.setTimeout(unpin, 250); // covers a click that needs no scrolling
+      history.replaceState(null, '', `#${id}`);
+      goTo(el);
+      if (e.detail === 0) {
+        el.tabIndex = -1;
+        el.style.outline = 'none';
+        el.focus({ preventScroll: true });
+      }
     };
-    // the person grabbed the page themselves: stop holding and follow where they actually are
     const takeOver = () => {
-      if (!pinned) return;
-      window.clearTimeout(release);
-      unpin();
+      if (pinned !== null) stop();
     };
 
     update();
@@ -81,7 +100,7 @@ export function useActiveSection(): NavId {
       window.removeEventListener('touchmove', takeOver);
       window.removeEventListener('keydown', takeOver);
       document.removeEventListener('click', onClick);
-      window.clearTimeout(release);
+      if (glide) cancelAnimationFrame(glide);
       if (raf) cancelAnimationFrame(raf);
     };
   }, []);

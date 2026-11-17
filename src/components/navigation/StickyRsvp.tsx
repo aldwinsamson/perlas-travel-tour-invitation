@@ -4,7 +4,6 @@ import { Icon } from '../common/Icon';
 import { eventConfig } from '../../config/event';
 import type { EventPhase } from '../../types';
 
-/** phones only: keeps the one action that matters a thumb away once the hero has scrolled off, and steps aside at the RSVP section itself */
 export default function StickyRsvp({ phase }: { phase: EventPhase }) {
   const [show, setShow] = useState(false);
 

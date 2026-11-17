@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { flightTiming } from '../../utils/intro';
 
-/** css-only sky for slow connections, devices without webgl, and after a gpu failure. gradients only: nothing to download, nothing heavy to paint. */
 export function FallbackSky() {
   return (
     <div className="sky-fallback" aria-hidden="true">
@@ -12,10 +11,6 @@ export function FallbackSky() {
   );
 }
 
-/**
- * lighter stand-in for the 3d flight: a navy airliner silhouette and a gold ribbon of light along the same
- * bottom-left to top-right diagonal, with the same framing bars and reveal beat. svg + the web animations api only.
- */
 export function FallbackFlight({ onReveal, onDone }: { onReveal: () => void; onDone: () => void }) {
   const planeRef = useRef<HTMLDivElement>(null);
   const trailRef = useRef<SVGPathElement>(null);
@@ -57,7 +52,6 @@ export function FallbackFlight({ onReveal, onDone }: { onReveal: () => void; onD
       clearTimeout(r);
       clearTimeout(d);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

@@ -16,7 +16,6 @@ interface Props {
   tabIndex?: number;
 }
 
-/** one button for every call to action, so spacing, focus and hover stay identical everywhere */
 export function Button({ children, href, onClick, variant = 'primary', onDark, small, external, disabled, className = '', type = 'button', ...aria }: Props) {
   const cls = ['btn', variant === 'gold' && 'btn--gold', variant === 'ghost' && 'btn--ghost', onDark && 'btn--on-dark', small && 'btn--sm', className]
     .filter(Boolean)

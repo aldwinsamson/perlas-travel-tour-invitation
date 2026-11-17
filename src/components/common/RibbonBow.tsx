@@ -1,9 +1,5 @@
 import { forwardRef } from 'react';
 
-/**
- * blue satin ribbon with a dimensional bow and orange under-tails, drawn after the one on the invitation.
- * the two bands are separate groups so the page can part them slightly as the visitor scrolls (the "cut").
- */
 export const RibbonBow = forwardRef<SVGSVGElement>(function RibbonBow(_, ref) {
   return (
     <svg ref={ref} className="ribbon" viewBox="0 0 1400 380" role="img" aria-label="A blue satin ribbon tied in a bow, with gold and orange edges">

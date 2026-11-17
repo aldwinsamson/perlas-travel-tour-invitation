@@ -6,7 +6,6 @@ import { directionsUrl } from '../../utils/url';
 
 const pad = (n: number) => String(n).padStart(2, '0');
 
-/** live countdown on the manila clock. swaps to an event-day or thank-you message when the date arrives. */
 export default function Countdown() {
   const c = useCountdown();
   const { copy, when, venue } = eventConfig;

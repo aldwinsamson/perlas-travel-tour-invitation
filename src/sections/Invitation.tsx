@@ -1,13 +1,11 @@
 import { eventConfig } from '../config/event';
 import { Icon } from '../components/common/Icon';
 
-/** the official invitation, shown as designed, with a one-tap download. renders nothing until invitation.image is set in config/event.ts */
 export default function Invitation() {
   const { invitation, agency, when } = eventConfig;
   const view = invitation.image;
   if (!view) return null;
 
-  // the saved file can be a different (higher quality or pdf) file than the one shown on the page
   const file = invitation.file ?? view;
   const ext = (file.split(/[?#]/)[0].split('.').pop() ?? 'png').toLowerCase();
   const saveAs = `${agency.name.replace(/[^a-z0-9]+/gi, '-')}-Invitation.${ext}`;
