@@ -9,5 +9,5 @@
   setTimeout(function () {
     var s = root.getAttribute('data-intro');
     if (s === 'loading' || s === 'playing') root.setAttribute('data-intro', 'done');
-  }, 36000);
+  }, 120000);
 })();

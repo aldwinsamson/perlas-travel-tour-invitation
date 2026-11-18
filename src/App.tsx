@@ -5,9 +5,10 @@ import { useEventPhase } from './hooks/useEventPhase';
 import MainLayout from './layouts/MainLayout';
 import SkyBackdrop from './components/intro/SkyBackdrop';
 import IntroOverlay from './components/intro/IntroOverlay';
+import EntryGate from './components/intro/EntryGate';
 import { FallbackFlight, FallbackSky } from './components/intro/FallbackSky';
 import { revealHero } from './components/hero/revealHero';
-import { BOOT_MIN_MS, engineAtLoad, flightTiming, setBootProgress, sinceNavigation, type Engine } from './utils/intro';
+import { BOOT_MIN_MS, OPEN_EVENT, engineAtLoad, flightTiming, markOpened, setBootProgress, sinceNavigation, type Engine } from './utils/intro';
 
 type Stage = 'off' | 'loading' | 'playing' | 'done';
 
@@ -19,7 +20,15 @@ export default function App() {
 
   const [engine, setEngine] = useState<Engine>(engineAtLoad);
   const [stage, setStage] = useState<Stage>(engineAtLoad === 'none' ? 'off' : 'loading');
+  const [opened, setOpened] = useState(false);
   const revealed = useRef(false);
+
+  // the tap itself is the user gesture browsers need, so the music element is unlocked right here, inside the click
+  const enter = useCallback(() => {
+    window.dispatchEvent(new Event(OPEN_EVENT));
+    markOpened();
+    setOpened(true);
+  }, []);
 
   const reveal = useCallback(() => {
     if (revealed.current) return;
@@ -50,20 +59,21 @@ export default function App() {
   }, [reveal]);
 
   useEffect(() => {
-    if (engine !== 'css' || stage !== 'loading') return;
+    if (engine !== 'css' || stage !== 'loading' || !opened) return;
     setBootProgress(0.85);
     const id = window.setTimeout(() => {
       setBootProgress(1);
       startFlight();
     }, Math.max(350, BOOT_MIN_MS - sinceNavigation()));
     return () => clearTimeout(id);
-  }, [engine, stage, startFlight]);
+  }, [engine, stage, opened, startFlight]);
 
   useEffect(() => {
-    if (stage === 'off' || stage === 'done') return;
-    const id = window.setTimeout(finish, Math.max(1500, eventConfig.intro.failsafeSeconds * 1000 - sinceNavigation()));
+    // counted from the tap, so a visitor who waits on the open button is never cut off
+    if (stage === 'off' || stage === 'done' || !opened) return;
+    const id = window.setTimeout(finish, eventConfig.intro.failsafeSeconds * 1000);
     return () => clearTimeout(id);
-  }, [stage, finish]);
+  }, [stage, opened, finish]);
 
   useEffect(() => {
     const site = document.getElementById('site');
@@ -76,6 +86,7 @@ export default function App() {
 
   return (
     <>
+      {stage === 'loading' && !opened && <EntryGate onEnter={enter} />}
       {engine === 'css' ? (
         <FallbackSky />
       ) : (

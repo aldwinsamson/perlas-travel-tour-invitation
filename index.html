@@ -29,7 +29,7 @@
       /* loading screen: pure html + css so it paints with the very first bytes, before any script has run */
       #boot{position:fixed;inset:0;z-index:200;display:none;place-items:center;background:linear-gradient(180deg,#d9eafb 0%,#f2f8ff 58%,#fff8e9 100%);color:#081847}
       html[data-intro='loading'] #boot,html[data-intro='playing'] #boot{display:grid}
-      html[data-intro='loading'] #boot{animation:bootOut .01s 34s forwards}
+      html[data-intro='loading'] #boot{animation:bootOut .01s 118s forwards}
       html[data-intro='playing'] #boot{opacity:0;visibility:hidden;transition:opacity 1s ease,visibility 0s 1s;pointer-events:none}
       .boot__core{display:grid;justify-items:center;gap:.35rem;padding:0 1.5rem;text-align:center}
       .boot__core img{width:112px;height:auto;margin-bottom:.8rem;animation:bootBreath 3.2s ease-in-out infinite}
@@ -38,6 +38,9 @@
       .boot__bar{width:min(220px,56vw);height:2px;margin-top:1.6rem;background:rgba(8,24,71,.14);overflow:hidden}
       .boot__bar i{display:block;height:100%;background:#ebaf19;transform-origin:left;transform:scaleX(var(--boot-p,.06));transition:transform .7s cubic-bezier(.22,.8,.2,1)}
       .boot__hint{margin:.9rem 0 0;font:500 .66rem/1 system-ui,sans-serif;letter-spacing:.3em;text-transform:uppercase;color:rgba(8,24,71,.55);padding-left:.3em}
+      #boot-action{position:absolute;left:0;right:0;bottom:max(12vh,3rem);display:flex;justify-content:center;padding:0 1.5rem}
+      .boot__btn{appearance:none;cursor:pointer;border:1px solid #081847;background:#081847;color:#fff8e9;padding:.95rem 2.2rem;font:600 .72rem/1 system-ui,sans-serif;letter-spacing:.3em;padding-left:calc(2.2rem + .3em);text-transform:uppercase;border-radius:999px;transition:background .25s ease,color .25s ease}
+      .boot__btn:hover,.boot__btn:focus-visible{background:#ebaf19;border-color:#ebaf19;color:#081847}
       @keyframes bootBreath{0%,100%{opacity:.92;transform:translateY(0)}50%{opacity:1;transform:translateY(-4px)}}
       @keyframes bootOut{to{opacity:0;visibility:hidden}}
       @media (prefers-reduced-motion:reduce){.boot__core img{animation:none}}
@@ -55,6 +58,7 @@
         <div class="boot__bar"><i></i></div>
         <p class="boot__hint">Preparing your invitation</p>
       </div>
+      <div id="boot-action"></div>
     </div>
     <div id="root"></div>
     <noscript>

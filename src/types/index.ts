@@ -27,7 +27,8 @@ export interface EventConfig {
     assumedDurationMinutes: number;
   };
   venue: { name: string; room: string; area: string; mapsUrl: string; mapsQuery: string; mapsEmbedAllowed: boolean };
-  host: { name: string; role: string; photo: string | null; bio: string | null };
+  host: { name: string; role: string; photo: string | null; cutout: string | null; bio: string | null };
+  music: { src: string | null; volume: number };
   invitation: { image: string | null; file: string | null; alt: string };
   copy: {
     inviteLead: string;

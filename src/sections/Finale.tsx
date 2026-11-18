@@ -28,12 +28,6 @@ export default function Finale({ phase }: { phase: EventPhase }) {
           <p className="finale__tags">{event.hashtags.join('   |   ')}</p>
         </div>
       </div>
-
-      {/* rendered satin ribbon (see README): transparent webp with its own soft shadow. the mobile crop is framed tighter. */}
-      <picture className="ribbon" data-reveal="fade">
-        <source media="(min-width: 768px)" srcSet="/images/ribbon-wide.webp" width="1800" height="975" />
-        <img src="/images/ribbon-mobile.webp" alt="" width="935" height="935" loading="lazy" decoding="async" />
-      </picture>
     </section>
   );
 }

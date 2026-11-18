@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import type { SkyScene } from './SkyScene';
 import { isLowPower, prefersReducedMotion } from '../../utils/capability';
-import { BOOT_MIN_MS, READY_BUDGET_MS, fetchModel, isCompact, onModelProgress, setBootProgress, sinceNavigation } from '../../utils/intro';
+import { BOOT_MIN_MS, READY_BUDGET_MS, fetchModel, isCompact, onModelProgress, setBootProgress, sinceNavigation, whenOpened } from '../../utils/intro';
 
 interface Props {
   playIntro: boolean;
@@ -61,6 +61,9 @@ export default function SkyBackdrop(p: Props) {
         if (cancelled) return;
         setBootProgress(1);
         await Promise.all([wait(Math.max(0, BOOT_MIN_MS - sinceNavigation())), import('gsap').catch(() => undefined)]);
+        if (cancelled) return;
+        // everything is loaded; the plane takes off only once the visitor has tapped open
+        await whenOpened;
         if (cancelled) return;
         cb.current.onStart();
         scene.play();

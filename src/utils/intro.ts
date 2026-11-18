@@ -31,6 +31,13 @@ export const flightTiming = () => {
 export const isCompact = () => window.innerWidth < eventConfig.intro.mobileBreakpoint;
 export const modelUrl = () => (isCompact() || isLowPower() ? MODEL_LITE : MODEL_FULL);
 
+/* ------------------------------------------------------------------ the open button
+   the flight waits for the visitor's tap. that tap is also what lets the browser play music later, so it is the autoplay unlock. */
+let openResolve: () => void = () => undefined;
+export const whenOpened = new Promise<void>((r) => (openResolve = r));
+export const markOpened = () => openResolve();
+export const OPEN_EVENT = 'perlas:open';
+
 /** milliseconds since the browser started loading this page */
 export const sinceNavigation = () => performance.now();
 

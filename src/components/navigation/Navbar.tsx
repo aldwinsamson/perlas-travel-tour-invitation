@@ -4,6 +4,7 @@ import { useActiveSection } from '../../hooks/useActiveSection';
 import { eventConfig } from '../../config/event';
 import { Button } from '../common/Button';
 import { Icon } from '../common/Icon';
+import { MusicToggle } from '../common/MusicToggle';
 import { SocialLinks } from '../common/SocialLinks';
 import type { EventPhase } from '../../types';
 
@@ -21,7 +22,6 @@ export default function Navbar({ phase }: { phase: EventPhase }) {
     return () => window.removeEventListener('scroll', on);
   }, []);
 
-  // mobile menu: lock scroll, trap focus, close on escape, hand focus back
   useEffect(() => {
     if (!open) return;
     const root = document.documentElement;
@@ -72,6 +72,7 @@ export default function Navbar({ phase }: { phase: EventPhase }) {
           ))}
         </nav>
         <div className="nav-actions">
+          <MusicToggle />
           <SocialLinks className="nav-social" />
           <Button href={rsvpHref} variant="gold" small className="nav-rsvp">
             {rsvpLabel}

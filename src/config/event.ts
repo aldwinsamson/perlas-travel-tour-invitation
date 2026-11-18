@@ -33,12 +33,17 @@ export const eventConfig: EventConfig = {
     name: 'Princess Elaine A. Tan',
     role: 'Founder and Owner',
     photo: '/images/owner-portrait.webp',
+    cutout: '/images/host-cutout.webp',
     bio: null,
   },
   invitation: {
     image: '/images/invitation.webp',
     file: '/downloads/perlas-invitation.png',
     alt: 'Official invitation to the grand opening and ribbon cutting ceremony of Perlas Travel & Tours',
+  },
+  music: {
+    src: '/audio/champagne-ocean.mp3',
+    volume: 0.5,
   },
   copy: {
     inviteLead: 'You are cordially invited to our',
@@ -64,15 +69,14 @@ export const eventConfig: EventConfig = {
     closing: 'Let\u2019s Explore, Discover, and Create More Journeys Together!',
   },
   program: {
-    tentative: true,
+    tentative: false,
     items: [
-      { title: 'Guest Arrival' },
-      { title: 'Welcome Remarks' },
-      { title: 'Opening Ceremony' },
-      { title: 'Ribbon Cutting Ceremony' },
-      { title: 'Message from the Founder and Owner' },
-      { title: 'Photo Opportunity' },
-      { title: 'Celebration and Fellowship' },
+      { time: '10:00 AM', title: 'Guest Arrival & Reception', description: 'Registration, snacks and refreshments' },
+      { time: '11:00 AM', title: 'Blessing of the Office Entrance', description: 'Ceremonial prayer and blessing' },
+      { time: '11:11 AM', title: 'Grand Ribbon-Cutting Ceremony', description: 'Official opening of Perlas Travel & Tours' },
+      { time: '11:30 AM', title: 'Blessing of the Office', description: 'Prayer for guidance and prosperity' },
+      { time: '11:40 AM', title: 'Message from the Founder', description: 'Company introduction and welcome remarks' },
+      { time: '11:50 AM onwards', title: 'Socials & Fellowship', description: 'Office tour and photo opportunities' },
     ],
   },
   rsvp: {
